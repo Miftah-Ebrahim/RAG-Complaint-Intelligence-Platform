@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+sentence-transformers
+chromadb
+faiss-cpu
+gradio
+huggingface-hub
+python-dotenv
+tqdm
