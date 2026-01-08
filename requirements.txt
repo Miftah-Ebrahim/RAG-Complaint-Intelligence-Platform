@@ -8,3 +8,6 @@ gradio
 huggingface-hub
 python-dotenv
 tqdm
+streamlit
+matplotlib
+jupyter

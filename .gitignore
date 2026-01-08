@@ -6,3 +6,5 @@ __pycache__/
 
 data/raw/
 vector_store/
+data/raw/*.csv
+data/processed/*.csv
