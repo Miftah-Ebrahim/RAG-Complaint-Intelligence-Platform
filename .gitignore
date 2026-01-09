@@ -8,3 +8,8 @@ data/raw/
 vector_store/
 data/raw/*.csv
 data/processed/*.csv
+
+# Except gitkeeps
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!vector_store/.gitkeep
