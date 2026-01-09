@@ -13,3 +13,7 @@ data/processed/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !vector_store/.gitkeep
+!logs/.gitkeep
+
+# Logs
+logs/*.log

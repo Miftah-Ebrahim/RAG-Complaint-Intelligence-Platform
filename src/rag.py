@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import os
 from src.config import VECTOR_STORE_DIR
 from src.custom_llm import HuggingFaceAPIWrapper
+from src.logger import logger
 
 load_dotenv()
 
@@ -17,7 +18,9 @@ def get_rag_chain():
 
     persist_dir = str(VECTOR_STORE_DIR)
     if not VECTOR_STORE_DIR.exists():
-        print(f"Warning: Vector store at {persist_dir} does not exist.")
+        logger.warning(
+            f"Vector store at {persist_dir} does not exist. Retrieval may fail."
+        )
 
     vector_db = Chroma(persist_directory=persist_dir, embedding_function=embedding)
     retriever = vector_db.as_retriever(search_kwargs={"k": 3})
