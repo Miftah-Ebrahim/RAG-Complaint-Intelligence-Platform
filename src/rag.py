@@ -65,10 +65,12 @@ def get_rag_chain():
     prompt = PromptTemplate(template=template, input_variables=["context", "question"])
 
     def format_docs(docs):
+        """Formats a list of documents into a single string."""
         return "\n\n".join(doc.page_content for doc in docs)
 
     # LCEL Chain
     def input_mapper(inputs):
+        """Maps input dictionary to expected keys."""
         return {"question": inputs["query"]}
 
     # Chain to get context (documents)
@@ -95,6 +97,7 @@ def get_rag_chain():
 
     # Output adapter to match {"result": ..., "source_documents": ...}
     def final_adapter(x):
+        """Adapts chain output to standard dictionary format."""
         return {"result": x["result"], "source_documents": x["context"]}
 
     return full_chain | final_adapter

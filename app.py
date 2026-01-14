@@ -25,6 +25,13 @@ with st.sidebar:
     )
     st.markdown("---")
     st.info("A production-ready RAG system for complaint intelligence.")
+    st.markdown("---")
+    if st.button("🗑️ Clear Conversation"):
+        st.session_state.messages = []
+        st.rerun()
+
+    st.markdown("---")
+    st.markdown("Created by **Miftah Ebrahim** for the 10 Academy Challenge.")
 
 st.title("💬 Complaint Intelligence Assistant")
 
