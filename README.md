@@ -335,7 +335,7 @@ With more time, the following enhancements would elevate the platform:
 - 🎓 10 Academy — Artificial Intelligence Mastery Program
 - 🔗 [GitHub](https://github.com/Miftah-Ebrahim)
 - 💼 [LinkedIn](https://linkedin.com/in/miftah-ebrahim)
-- 📧 Contact: miftah.ebrahim@example.com
+- 📧 Contact: miftahh.dev@example.com
 
 ---
 
