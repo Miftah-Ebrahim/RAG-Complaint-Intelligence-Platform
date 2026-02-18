@@ -1,16 +1,9 @@
 pandas
-numpy
-scikit-learn
-sentence-transformers
 chromadb
-faiss-cpu
-gradio
 huggingface-hub
 python-dotenv
-tqdm
 streamlit
 matplotlib
-jupyter
 langchain
 langchain-community
 langchain-huggingface
@@ -18,3 +11,6 @@ langchain-chroma
 pydantic
 pydantic-core
 wordcloud
+sentence-transformers
+requests
+pytest

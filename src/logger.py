@@ -1,17 +1,37 @@
+"""Centralized logging for the CrediTrust RAG platform.
+
+Provides a singleton ``logger`` instance with both file and console
+output, ensuring consistent log formatting across the entire application.
+"""
+
 import logging
 import sys
 from pathlib import Path
 
 
-def setup_logger(name: str = "CrediTrust_RAG", log_file: str = "app.log"):
-    """Configures a robust logger with both console and file output."""
+def setup_logger(
+    name: str = "CrediTrust_RAG", log_file: str = "app.log"
+) -> logging.Logger:
+    """Configure and return a logger with console and file handlers.
 
+    Creates a ``logs/`` directory in the current working directory if it
+    does not already exist, and attaches a file handler and a console
+    handler with a unified format.
+
+    Args:
+        name: Name assigned to the logger instance.
+        log_file: Filename for the log file inside the ``logs/``
+            directory.
+
+    Returns:
+        A configured ``logging.Logger`` instance.
+    """
     # Create logs directory if it doesn't exist
-    log_dir = Path("logs")
+    log_dir: Path = Path("logs")
     log_dir.mkdir(exist_ok=True)
 
     # Create logger
-    logger = logging.getLogger(name)
+    logger: logging.Logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
     # Prevent duplicate handlers
@@ -39,4 +59,4 @@ def setup_logger(name: str = "CrediTrust_RAG", log_file: str = "app.log"):
 
 
 # Singleton logger instance
-logger = setup_logger()
+logger: logging.Logger = setup_logger()

@@ -1,13 +1,25 @@
+"""Unit tests for the RAG chain initialization."""
+
 import unittest
 from unittest.mock import MagicMock, patch
-from src.rag import get_rag_chain
 
 
 class TestRAG(unittest.TestCase):
-    @patch("src.rag.Chroma")
-    @patch("src.rag.HuggingFaceEmbeddings")
+    """Verify that ``get_rag_chain`` wires components correctly."""
+
     @patch("src.rag.HuggingFaceAPIWrapper")
-    def test_rag_chain_initialization(self, mock_llm, mock_embed, mock_chroma):
+    @patch("src.rag.HuggingFaceEmbeddings")
+    @patch("src.rag.Chroma")
+    def test_rag_chain_initialization(
+        self,
+        mock_chroma: MagicMock,
+        mock_embed: MagicMock,
+        mock_llm: MagicMock,
+    ) -> None:
+        """Chain should initialise without errors and call Chroma with k=RETRIEVER_K."""
+        from src.rag import get_rag_chain
+        from src.config import RETRIEVER_K
+
         # Mock VectorDB and Retriever
         mock_db = MagicMock()
         mock_retriever = MagicMock()
@@ -19,7 +31,7 @@ class TestRAG(unittest.TestCase):
 
         # Assertions
         mock_chroma.assert_called()
-        mock_db.as_retriever.assert_called_with(search_kwargs={"k": 3})
+        mock_db.as_retriever.assert_called_with(search_kwargs={"k": RETRIEVER_K})
         self.assertIsNotNone(chain)
 
 

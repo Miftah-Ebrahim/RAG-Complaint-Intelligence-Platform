@@ -1,28 +1,59 @@
-import pandas as pd
-import os
+"""Vector-store ingestion pipeline for the CrediTrust RAG system.
+
+Reads the filtered complaint CSV, performs stratified sampling,
+converts rows to LangChain documents, chunks the text, embeds with
+HuggingFace embeddings, and persists a Chroma vector store to disk.
+"""
+
 import shutil
-from pathlib import Path
+from typing import Optional
+
+import pandas as pd
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from src.config import FILTERED_CSV, VECTOR_STORE_DIR
+
+from src.config import (
+    CHUNK_OVERLAP,
+    CHUNK_SIZE,
+    EMBEDDING_MODEL_NAME,
+    FILTERED_CSV,
+    SAMPLE_PER_CLASS,
+    VECTOR_STORE_DIR,
+)
+from src.data_processing import create_documents, stratified_sample
 from src.logger import logger
-from src.data_processing import stratified_sample, create_documents
 
 
-def ingest_data(reset_db: bool = True):
-    """Main ingestion logic."""
+def ingest_data(reset_db: bool = True) -> None:
+    """Run the full document ingestion pipeline.
+
+    Steps:
+      1. Load the filtered CSV produced by ``etl.run_etl()``.
+      2. Perform stratified sampling (``config.SAMPLE_PER_CLASS`` per
+         product).
+      3. Convert rows to LangChain ``Document`` objects.
+      4. Split documents into chunks of ``config.CHUNK_SIZE`` characters.
+      5. Embed chunks and persist them in a Chroma vector store.
+
+    Args:
+        reset_db: If ``True``, delete the existing vector store before
+            ingesting.  Defaults to ``True``.
+
+    Returns:
+        None.  Side-effect: writes a Chroma vector store to
+        ``config.VECTOR_STORE_DIR``.
+    """
     if not FILTERED_CSV.exists():
         logger.error(f"Filtered CSV not found at {FILTERED_CSV}. Run etl.py first.")
         return
 
     # 1. Load Data
     logger.info(f"Loading data from {FILTERED_CSV}...")
-    df = pd.read_csv(FILTERED_CSV, low_memory=False)
+    df: pd.DataFrame = pd.read_csv(FILTERED_CSV, low_memory=False)
 
     # 2. Stratified Sampling
-    # Using 300 to keep it lighter for local machine, but balanced
-    df_sampled = stratified_sample(df, n_per_class=300)
+    df_sampled: pd.DataFrame = stratified_sample(df, n_per_class=SAMPLE_PER_CLASS)
 
     # 3. Create Documents w/ Metadata
     raw_docs = create_documents(df_sampled)
@@ -30,9 +61,8 @@ def ingest_data(reset_db: bool = True):
     # 4. Chunking
     logger.info("Splitting text into chunks...")
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
-        truncation=True,  # Ensure hard limit if needed
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
     )
     chunks = splitter.split_documents(raw_docs)
     logger.info(f"Generated {len(chunks)} text chunks.")
@@ -44,9 +74,8 @@ def ingest_data(reset_db: bool = True):
         logger.warning(f"Deleting existing vector store at {VECTOR_STORE_DIR}")
         shutil.rmtree(VECTOR_STORE_DIR)
 
-    embedding_fn = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embedding_fn = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL_NAME)
 
-    # Batch processing is safer for large datasets, but for 2000 docs standard is fine
     Chroma.from_documents(
         documents=chunks,
         embedding=embedding_fn,
